@@ -2,12 +2,6 @@
   "name": "nextjs-template",
   "version": "0.1.0",
   "private": true,
-  "imports": {
-    "#*": [
-      "./src/*.ts",
-      "./src/*.tsx"
-    ]
-  },
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",

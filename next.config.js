@@ -10,7 +10,8 @@ const nextConfig = {
   // github pagesの場合
   // output: 'export',
   // k8sの場合
-  output: 'standalone'
+  output: 'standalone',
+  allowedDevOrigins: ['192.168.16.12']
 };
 
 module.exports = nextConfig;
