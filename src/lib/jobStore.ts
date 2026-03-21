@@ -9,5 +9,8 @@ type GlobalWithStore = typeof globalThis & {
 
 const g = globalThis as GlobalWithStore;
 
-export const jobStore: Map<string, JobState> = g.__jobStore ?? (g.__jobStore = new Map());
-export const processMap: Map<string, ChildProcess> = g.__processMap ?? (g.__processMap = new Map());
+if (!g.__jobStore) g.__jobStore = new Map();
+export const jobStore: Map<string, JobState> = g.__jobStore;
+
+if (!g.__processMap) g.__processMap = new Map();
+export const processMap: Map<string, ChildProcess> = g.__processMap;

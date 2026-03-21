@@ -1,7 +1,7 @@
 'use client';
 
 import { Text } from '@mantine/core';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CropRect } from '@/lib/types';
 
 type Props = {
@@ -15,8 +15,10 @@ export const CropCanvas = ({ imageUrl, onChange, currentRect }: Props) => {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const startPosRef = useRef({ x: 0, y: 0 });
+  // currentRectをrefで保持することで、useEffect依存配列に含めずに参照できるようにする
+  const currentRectRef = useRef(currentRect);
 
-  const drawCanvas = (rect: { x: number; y: number; w: number; h: number } | null) => {
+  const drawCanvas = useCallback((rect: { x: number; y: number; w: number; h: number } | null) => {
     const canvas = canvasRef.current;
     const img = imgRef.current;
     if (!canvas || !img) return;
@@ -33,7 +35,7 @@ export const CropCanvas = ({ imageUrl, onChange, currentRect }: Props) => {
     ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
     ctx.fillStyle = 'rgba(0, 120, 255, 0.15)';
     ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-  };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -50,21 +52,19 @@ export const CropCanvas = ({ imageUrl, onChange, currentRect }: Props) => {
       canvas.height = Math.round(img.naturalHeight * scale);
 
       // 既存の選択範囲を描画
-      if (currentRect) {
+      if (currentRectRef.current) {
         const displayRect = {
-          x: currentRect.x * canvas.width,
-          y: currentRect.y * canvas.height,
-          w: currentRect.w * canvas.width,
-          h: currentRect.h * canvas.height
+          x: currentRectRef.current.x * canvas.width,
+          y: currentRectRef.current.y * canvas.height,
+          w: currentRectRef.current.w * canvas.width,
+          h: currentRectRef.current.h * canvas.height
         };
         drawCanvas(displayRect);
       } else {
         drawCanvas(null);
       }
     };
-    // currentRectは初回のみ使用するため依存配列から除外
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imageUrl]);
+  }, [imageUrl, drawCanvas]);
 
   const getCanvasPos = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
